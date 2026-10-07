@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ayusi Parida – AI/ML and Product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F5F8;
+  --panel:#E3EAF0;
+  --ink:#141D27;
+  --muted:#52606E;
+  --line:#C7D2DC;
+  --signal:#2447E0;
+  --signal-ink:#FFFFFF;
+  --detect:#FFC53D;
+  --a1:#FFE7A8;
+  --a2:#BDEBDC;
+  --a3:#D8D0FF;
+  --hero:#2043D8;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Instrument Sans","Segoe UI",system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F161D;--panel:#18222C;--ink:#E9EFF4;--muted:#9DABB9;--line:#2B3946;
+    --signal:#86A1FF;--signal-ink:#0B1220;
+    --a1:#3B2F0C;--a2:#0F3429;--a3:#2B2556;--hero:#1A35B8;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F161D;--panel:#18222C;--ink:#E9EFF4;--muted:#9DABB9;--line:#2B3946;
+  --signal:#86A1FF;--signal-ink:#0B1220;
+  --a1:#3B2F0C;--a2:#0F3429;--a3:#2B2556;--hero:#1A35B8;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);scroll-behavior:smooth;height:auto}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.125rem;line-height:1.6;overflow-x:hidden}
+a{color:var(--signal)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--detect);outline-offset:3px;border-radius:6px}
+.wrap{max-width:74rem;margin:0 auto;padding:0 1.5rem}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-top:.6rem;padding-bottom:.6rem;flex-wrap:wrap}
+.bar nav{display:flex;gap:1.3rem;font-size:.97rem;font-weight:500}
+.bar nav a{color:var(--muted);text-decoration:none}
+.bar nav a:hover{color:var(--ink)}
+.lens{display:inline-flex;background:var(--panel);border-radius:999px;padding:3px;border:1px solid var(--line)}
+.lens button{font:inherit;font-size:.93rem;font-weight:600;border:0;background:transparent;color:var(--muted);padding:.45rem 1.1rem;border-radius:999px;cursor:pointer}
+.lens button[aria-pressed="true"]{background:var(--signal);color:var(--signal-ink)}
+
+/* hero */
+.hero{background:var(--hero);color:#fff;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:2rem;align-items:center;padding-top:clamp(3rem,8vw,6rem);padding-bottom:clamp(3rem,8vw,6rem)}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(4rem,13vw,10.5rem);line-height:.9;letter-spacing:-.04em;margin:0}
+.hero h1 span{display:block}
+.pitch{max-width:34rem;font-size:clamp(1.3rem,2.6vw,1.85rem);line-height:1.3;margin:1.8rem 0 .9rem;font-weight:500}
+.hero .meta{margin:0;color:rgba(255,255,255,.8);max-width:32rem}
+.hero-links{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
+.btn{display:inline-block;font-weight:600;text-decoration:none;padding:.8rem 1.5rem;border-radius:10px;border:2px solid currentColor;color:inherit;font-size:1.02rem}
+.btn.amber{background:var(--detect);border-color:var(--detect);color:#141D27}
+.btn.white{color:#fff}
+.btn:hover{transform:translateY(-2px)}
+.hero-art{width:100%;max-width:30rem;justify-self:end}
+.hero-art svg{display:block;width:100%;height:auto;overflow:visible}
+.bone{stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.85}
+.joint{fill:var(--detect);stroke:#fff;stroke-width:2}
+.dbox{fill:none;stroke:var(--detect);stroke-width:4}
+.dlabel{fill:var(--detect)}
+.dtext{fill:#141D27;font-family:var(--body);font-weight:600;font-size:15px}
+.gridline{stroke:#fff;opacity:.12}
+
+/* keyword strip */
+.strip{background:var(--detect);color:#141D27;overflow:hidden;border-bottom:1px solid rgba(0,0,0,.15)}
+.track{display:flex;width:max-content}
+.set{display:flex;margin:0;padding:.9rem 0;list-style:none;font-family:var(--display);font-weight:700;font-size:1.25rem;white-space:nowrap}
+.set li{padding-right:2rem}
+.set li::after{content:"\25C6";margin-left:2rem;font-size:.7em;vertical-align:middle}
+.set.dup{display:none}
+
+/* sections */
+.sec{padding:clamp(3.5rem,8vw,6.5rem) 0}
+.sec h2{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,6.5vw,4.6rem);letter-spacing:-.035em;line-height:1;margin:0 0 2.2rem}
+h3{font-family:var(--display);font-weight:700;letter-spacing:-.015em;margin:0}
+
+/* about */
+.about{display:grid;grid-template-columns:1.4fr 1fr;gap:3rem;align-items:start}
+.about .lead{font-size:clamp(1.35rem,2.6vw,1.9rem);line-height:1.4;font-weight:500;margin:0 0 1rem;max-width:40rem}
+.about p{margin:0 0 1rem;max-width:38rem;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.stat{background:var(--panel);border-radius:20px;padding:1.3rem 1.4rem}
+.stat b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,5vw,3.6rem);line-height:1;letter-spacing:-.03em;color:var(--signal)}
+.stat span{display:block;margin-top:.5rem;color:var(--muted);font-size:.98rem;line-height:1.35}
+
+/* projects */
+.proj{border-radius:32px;padding:clamp(1.5rem,4vw,3.2rem);display:grid;grid-template-columns:1.05fr 1fr;gap:2.5rem;align-items:center;margin-bottom:1.6rem;background:var(--a)}
+.p1{--a:var(--a1)}.p2{--a:var(--a2)}.p3{--a:var(--a3)}
+.proj.rev .proj-art{order:-1}
+.pill{display:inline-block;font-size:.92rem;font-weight:600;background:color-mix(in srgb,var(--ink) 10%,transparent);border-radius:999px;padding:.25rem .85rem}
+.proj h3{font-size:clamp(2rem,4.6vw,3.3rem);line-height:1.02;margin:1rem 0 .5rem}
+.role{font-weight:600;margin:0 0 .9rem;color:var(--ink)}
+.proj .what{font-size:1.2rem;margin:0 0 1rem;max-width:34rem}
+.proj ul.pts{margin:0;padding-left:1.15rem;max-width:36rem}
+.proj ul.pts li{margin:.45rem 0}
+.stack{display:flex;flex-wrap:wrap;gap:.45rem;margin:1.3rem 0 0;padding:0;list-style:none}
+.stack li{font-size:.9rem;font-weight:500;border:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent);border-radius:8px;padding:.15rem .65rem}
+.repo{display:inline-block;margin-top:1.2rem;font-weight:600;color:var(--ink)}
+.proj-art{margin:0}
+.proj-art svg{display:block;width:100%;height:auto;border-radius:22px;background:color-mix(in srgb,var(--paper) 55%,transparent)}
+.proj-art figcaption{font-size:.85rem;color:var(--muted);margin-top:.6rem}
+.s-ink{stroke:var(--ink)}
+.f-ink{fill:var(--ink)}
+.f-paper{fill:var(--paper)}
+.f-signal{fill:var(--signal)}
+.t{font-family:var(--body);font-size:15px;font-weight:600}
+.t-in{fill:var(--signal-ink)}
+.t-ink{fill:var(--ink)}
+.t-mut{fill:var(--muted);font-weight:500;font-size:13px}
+
+/* lens switching */
+body[data-lens="dev"] .pm{display:none}
+body[data-lens="pm"] .dev{display:none}
+
+/* path */
+.tl{list-style:none;margin:0;padding:0 0 0 2.2rem;border-left:4px solid var(--line);max-width:50rem}
+.tl li{position:relative;padding-bottom:2.4rem}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:calc(-2.2rem - 10px);top:.45rem;width:16px;height:16px;border-radius:50%;background:var(--signal);border:4px solid var(--paper);box-sizing:content-box}
+.tl .d{color:var(--muted);font-weight:600;font-size:.98rem}
+.tl h3{font-size:clamp(1.4rem,3vw,1.9rem);margin:.15rem 0 .1rem}
+.tl .org{color:var(--muted);margin:0 0 .5rem}
+.tl ul{margin:.4rem 0 0;padding-left:1.15rem}
+.tl ul li{padding:0;margin:.3rem 0}
+.tl ul li::before{display:none}
+
+/* skills */
+.skillgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem}
+.sk{background:var(--panel);border-radius:24px;padding:1.6rem}
+.sk h3{font-size:1.4rem;margin-bottom:1rem}
+.chips{display:flex;flex-wrap:wrap;gap:.55rem;margin:0;padding:0;list-style:none}
+.chips li{font-weight:500;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:.35rem .95rem}
+
+/* education */
+.edu{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+.card{border:2px solid var(--ink);border-radius:24px;padding:1.6rem}
+.card h3{font-size:1.5rem;margin-bottom:.5rem}
+.card p{margin:.2rem 0}
+.card ul{margin:.3rem 0 0;padding-left:1.15rem}
+.card li{margin:.5rem 0}
+
+/* contact */
+.contact{background:var(--hero);color:#fff}
+.contact .wrap{padding-top:clamp(3.5rem,9vw,7rem);padding-bottom:clamp(3.5rem,9vw,6rem)}
+.contact h2{font-family:var(--display);font-weight:800;font-size:clamp(2.8rem,9vw,7rem);letter-spacing:-.04em;line-height:.95;margin:0 0 2rem;max-width:56rem}
+.contact .email{display:inline-block;font-family:var(--display);font-weight:700;font-size:clamp(1.3rem,3.6vw,2.4rem);color:var(--detect);margin-bottom:1.8rem;word-break:break-all}
+.contact .links{display:flex;gap:.8rem;flex-wrap:wrap}
+
+
+/* case studies */
+.case{display:grid;grid-template-columns:15rem 1fr;gap:1.5rem 3.5rem;padding:2.6rem 0;border-top:2px solid var(--ink)}
+.case h3{font-size:clamp(1.8rem,3.6vw,2.5rem);line-height:1.05;margin:.7rem 0 0}
+.case .kv dt{font-family:var(--display);font-weight:700;font-size:1.25rem;margin:0 0 .3rem}
+.case .kv dd{margin:0 0 1.6rem;max-width:42rem}
+.case .kv dd ul{margin:.3rem 0 0;padding-left:1.15rem}
+.case .kv dd li{margin:.35rem 0}
+
+/* research spotlight */
+.spot{background:var(--ink);color:var(--paper)}
+.spot .wrap{padding-top:clamp(3.5rem,8vw,6rem);padding-bottom:clamp(3.5rem,8vw,6rem)}
+.spot h2{font-family:var(--display);font-weight:800;font-size:clamp(2.6rem,8vw,6rem);letter-spacing:-.04em;line-height:.95;margin:0 0 1.6rem;max-width:52rem}
+.spot .big{font-size:clamp(1.25rem,2.6vw,1.75rem);line-height:1.35;max-width:44rem;margin:0 0 2.4rem;font-weight:500}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin:0}
+.facts div{border-top:2px solid var(--detect);padding-top:.8rem}
+.facts dt{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--detect)}
+.facts dd{margin:.25rem 0 0;opacity:.9}
+
+/* process */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;counter-reset:st}
+.steps li{counter-increment:st;border-top:4px solid var(--signal);padding-top:1rem}
+.steps li::before{content:counter(st);display:block;font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:1;color:var(--signal);margin-bottom:.6rem}
+.steps h3{font-size:1.25rem;margin-bottom:.4rem}
+.steps p{margin:0;color:var(--muted);font-size:1rem;line-height:1.5}
+
+/* tech matrix */
+.mx-wrap{overflow-x:auto;border:2px solid var(--ink);border-radius:20px}
+.mx{width:100%;border-collapse:collapse;min-width:34rem}
+.mx th,.mx td{padding:.9rem 1.1rem;text-align:left;border-bottom:1px solid var(--line)}
+.mx thead th{font-family:var(--display);font-weight:700;background:var(--panel)}
+.mx tbody tr:last-child td,.mx tbody tr:last-child th{border-bottom:0}
+.mx tbody th{font-weight:600}
+.mx td.y{color:var(--signal);font-weight:800;font-size:1.2rem}
+.mx td.n{color:var(--line)}
+
+/* what I bring */
+.bring{display:grid;grid-template-columns:repeat(2,1fr);gap:1.4rem}
+.br{border-radius:28px;padding:1.8rem}
+.br:nth-child(1){background:var(--a1)}.br:nth-child(2){background:var(--a2)}.br:nth-child(3){background:var(--a3)}.br:nth-child(4){background:var(--panel)}
+.br h3{font-size:1.6rem;margin-bottom:.6rem}
+.br p{margin:0;max-width:30rem}
+
+/* motion: one orchestrated hero moment, only when allowed */
+@media (prefers-reduced-motion:no-preference){
+  .joint{animation:pop .4s ease-out both;animation-delay:calc(var(--i) * 55ms + 250ms)}
+  .bone{animation:fade .6s ease-out .2s both}
+  .dbox{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .9s ease-out 1.5s forwards}
+  .dlabel,.dtext{animation:fade .4s ease-out 2.2s both}
+  .set.dup{display:flex}
+  .track{animation:slide 38s linear infinite}
+  .strip:hover .track{animation-play-state:paused}
+}
+@keyframes pop{from{opacity:0;transform:scale(0);transform-box:fill-box;transform-origin:center}to{opacity:1;transform:scale(1);transform-box:fill-box;transform-origin:center}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes slide{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .strip{overflow-x:auto}
+}
+
+@media (max-width:860px){
+  .hero-grid,.about,.proj,.skillgrid,.edu,.case,.bring{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .steps li{display:grid;grid-template-columns:3.4rem 1fr;gap:0 1rem;align-items:start}
+  .steps li::before{grid-row:span 2;margin:0}
+  .hero-art{justify-self:start;max-width:22rem}
+  .proj.rev .proj-art{order:0}
+  .bar nav{display:none}
+}
+</style>
+</head>
+<body data-lens="dev">
+
+<header class="bar">
+  <div class="wrap">
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#work">Projects</a>
+      <a href="#cases">Case studies</a>
+      <a href="#process">Process</a>
+      <a href="#path">Path</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="lens" role="group" aria-label="Choose how my work is described">
+      <button type="button" id="b-dev" aria-pressed="true">Developer view</button>
+      <button type="button" id="b-pm" aria-pressed="false">Product view</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="hero" aria-label="Introduction">
+  <div class="wrap hero-grid">
+    <div>
+      <h1><span>Ayusi</span><span>Parida</span></h1>
+      <p class="pitch dev">I build computer vision and machine learning systems that help people when speed and clarity matter.</p>
+      <p class="pitch pm">I take products from the first user question to launch, with a focus on accessibility and health.</p>
+      <p class="meta">B.Tech student in Computer Science and Engineering at VIT Bhopal. Published in IEEE Xplore. Graduating May 2027.</p>
+      <div class="hero-links">
+        <a class="btn amber" href="#work">See my projects</a>
+        <a class="btn white" href="mailto:ayushiparida2004@gmail.com">Email me</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 400 330" role="img" aria-label="A hand with landmark points and a detection box labelled help">
+        <g class="gridline" stroke-width="1">
+          <line x1="0" y1="82" x2="400" y2="82"/><line x1="0" y1="165" x2="400" y2="165"/><line x1="0" y1="248" x2="400" y2="248"/>
+          <line x1="100" y1="0" x2="100" y2="330"/><line x1="200" y1="0" x2="200" y2="330"/><line x1="300" y1="0" x2="300" y2="330"/>
+        </g>
+        <g class="bone">
+          <polyline points="208,250 150,222 128,190 112,162"/>
+          <polyline points="208,250 170,195 165,150 162,115 160,85"/>
+          <polyline points="208,250 200,188 200,135 200,95 200,62"/>
+          <polyline points="208,250 230,192 235,142 238,105 240,78"/>
+          <polyline points="208,250 255,205 268,165 276,135 282,112"/>
+          <polyline points="170,195 200,188 230,192 255,205"/>
+        </g>
+        <g>
+          <circle class="joint" style="--i:0" cx="208" cy="250" r="7"/>
+          <circle class="joint" style="--i:1" cx="150" cy="222" r="6"/><circle class="joint" style="--i:2" cx="128" cy="190" r="6"/><circle class="joint" style="--i:3" cx="112" cy="162" r="6"/>
+          <circle class="joint" style="--i:4" cx="170" cy="195" r="6"/><circle class="joint" style="--i:5" cx="165" cy="150" r="6"/><circle class="joint" style="--i:6" cx="162" cy="115" r="6"/><circle class="joint" style="--i:7" cx="160" cy="85" r="6"/>
+          <circle class="joint" style="--i:8" cx="200" cy="188" r="6"/><circle class="joint" style="--i:9" cx="200" cy="135" r="6"/><circle class="joint" style="--i:10" cx="200" cy="95" r="6"/><circle class="joint" style="--i:11" cx="200" cy="62" r="6"/>
+          <circle class="joint" style="--i:12" cx="230" cy="192" r="6"/><circle class="joint" style="--i:13" cx="235" cy="142" r="6"/><circle class="joint" style="--i:14" cx="238" cy="105" r="6"/><circle class="joint" style="--i:15" cx="240" cy="78" r="6"/>
+          <circle class="joint" style="--i:16" cx="255" cy="205" r="6"/><circle class="joint" style="--i:17" cx="268" cy="165" r="6"/><circle class="joint" style="--i:18" cx="276" cy="135" r="6"/><circle class="joint" style="--i:19" cx="282" cy="112" r="6"/>
+        </g>
+        <rect class="dbox" pathLength="1" x="86" y="46" width="224" height="232" rx="6"/>
+        <rect class="dlabel" x="86" y="18" width="116" height="28" rx="5"/>
+        <text class="dtext" x="97" y="38">help 0.97</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="track">
+    <ul class="set"><li>Computer vision</li><li>Product strategy</li><li>Healthcare AI</li><li>Accessibility</li><li>YOLOv10</li><li>User research</li><li>Flask and React</li><li>IEEE Xplore</li><li>Machine learning</li><li>Roadmapping</li></ul>
+    <ul class="set dup"><li>Computer vision</li><li>Product strategy</li><li>Healthcare AI</li><li>Accessibility</li><li>YOLOv10</li><li>User research</li><li>Flask and React</li><li>IEEE Xplore</li><li>Machine learning</li><li>Roadmapping</li></ul>
+  </div>
+</div>
+
+<section class="sec" id="about">
+  <div class="wrap about">
+    <div>
+      <h2>About me</h2>
+      <p class="lead dev">I'm a computer science student at VIT Bhopal who builds machine learning systems for healthcare and accessibility.</p>
+      <p class="lead pm">I lead products from user needs to launch, mostly in healthcare and accessibility.</p>
+      <p class="dev">My work so far includes a real-time gesture recognition system for emergencies, a symptom-based disease predictor with a React and Flask stack, and a fingerprint-based blood group model that I published at IEEE Xplore. In 2026 I worked as an AI/ML intern at MPOnline Limited.</p>
+      <p class="pm">I define personas, write user stories, set success benchmarks and work with engineers to ship. Because I also build the ML and full-stack parts myself, I can weigh technical trade-offs realistically when deciding what to prioritize.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>3</b><span>projects built and shipped</span></div>
+      <div class="stat"><b>1</b><span>paper published in IEEE Xplore</span></div>
+      <div class="stat"><b>8.59</b><span>CGPA at VIT Bhopal</span></div>
+      <div class="stat"><b>2027</b><span>graduating, B.Tech CSE</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="work" style="padding-top:0">
+  <div class="wrap">
+    <h2>Projects</h2>
+
+    <article class="proj p1">
+      <div>
+        <span class="pill">Jun 2025 – Apr 2026</span>
+        <h3>Gesture recognition for emergencies</h3>
+        <p class="role dev">I built the models and the pipeline</p>
+        <p class="role pm">I led the product from problem to delivery</p>
+        <p class="what">A real-time tool that lets deaf and non-verbal people ask for help in an emergency.</p>
+        <ul class="pts dev">
+          <li>Trained CNN and YOLOv10 models to detect and classify gestures, tuned for fast real-time inference.</li>
+          <li>Handled data preprocessing, training, evaluation and optimization in Python.</li>
+          <li>Designed around accessibility: it has to work when the person cannot speak.</li>
+        </ul>
+        <ul class="pts pm">
+          <li>Researched user needs and defined two personas, which led to a dual-mode experience for general and specially-abled users.</li>
+          <li>Turned accessibility requirements into a feature set and worked with engineers to put performance and reliability first.</li>
+          <li>Set and tracked benchmarks for detection accuracy and response speed to decide when it was ready for real use.</li>
+        </ul>
+        <ul class="stack" aria-label="Technologies"><li>Python</li><li>CNN</li><li>YOLOv10</li><li>Computer Vision</li></ul>
+        <a class="repo" href="https://github.com/ayusiparida/emergency-sign-language-detection" target="_blank" rel="noopener">Project repository on GitHub</a>
+      </div>
+      <figure class="proj-art">
+        <svg viewBox="0 0 400 320" role="img" aria-label="Hand landmarks inside a detection box">
+          <g stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" class="s-ink" opacity=".8">
+            <polyline points="190,255 148,228 126,196 110,168"/>
+            <polyline points="190,255 170,200 166,155 163,120 161,92"/>
+            <polyline points="190,255 200,193 200,140 200,100 200,70"/>
+            <polyline points="190,255 230,197 235,147 238,110 240,84"/>
+            <polyline points="190,255 255,210 268,170 276,140 282,118"/>
+            <polyline points="170,200 200,193 230,197 255,210"/>
+          </g>
+          <g fill="#FFC53D" stroke="#141D27" stroke-width="2">
+            <circle cx="190" cy="255" r="7"/><circle cx="148" cy="228" r="6"/><circle cx="126" cy="196" r="6"/><circle cx="110" cy="168" r="6"/>
+            <circle cx="170" cy="200" r="6"/><circle cx="166" cy="155" r="6"/><circle cx="163" cy="120" r="6"/><circle cx="161" cy="92" r="6"/>
+            <circle cx="200" cy="193" r="6"/><circle cx="200" cy="140" r="6"/><circle cx="200" cy="100" r="6"/><circle cx="200" cy="70" r="6"/>
+            <circle cx="230" cy="197" r="6"/><circle cx="235" cy="147" r="6"/><circle cx="238" cy="110" r="6"/><circle cx="240" cy="84" r="6"/>
+            <circle cx="255" cy="210" r="6"/><circle cx="268" cy="170" r="6"/><circle cx="276" cy="140" r="6"/><circle cx="282" cy="118" r="6"/>
+          </g>
+          <rect x="86" y="52" width="216" height="222" rx="6" fill="none" stroke="#E0A000" stroke-width="4"/>
+          <rect x="86" y="24" width="116" height="28" rx="5" fill="#E0A000"/>
+          <text class="t" x="97" y="44" fill="#141D27">help 0.97</text>
+        </svg>
+        <figcaption>Illustration of hand landmarks and a detection box</figcaption>
+      </figure>
+    </article>
+
+    <article class="proj p2 rev">
+      <div>
+        <span class="pill">Jan 2025 – May 2025</span>
+        <h3>Multi-Disease Prediction System</h3>
+        <p class="role dev">I built it full stack</p>
+        <p class="role pm">I managed it from requirements to launch</p>
+        <p class="what">A web app where people select symptoms and get a likely condition with a confidence score.</p>
+        <ul class="pts dev">
+          <li>Served machine learning models through Flask REST APIs for real-time prediction.</li>
+          <li>Built the React interface for symptom selection and result visualization, connected with Axios.</li>
+          <li>Deployed to a cloud platform so anyone can use it.</li>
+        </ul>
+        <ul class="pts pm">
+          <li>Wrote user stories and scoped features across backend and frontend work.</li>
+          <li>Ran the rollout to production for public access.</li>
+          <li>After launch, prioritized confidence scores plus condition descriptions and precautions to build trust.</li>
+        </ul>
+        <ul class="stack" aria-label="Technologies"><li>Python</li><li>Flask</li><li>React.js</li><li>REST API</li><li>Machine Learning</li></ul>
+        <a class="repo" href="https://github.com/ayusiparida/disease-prediction-system" target="_blank" rel="noopener">Project repository on GitHub</a>
+      </div>
+      <figure class="proj-art">
+        <svg viewBox="0 0 400 320" role="img" aria-label="Sketch of a symptom checker screen">
+          <rect class="f-paper s-ink" x="60" y="18" width="280" height="284" rx="26" stroke-width="2.5"/>
+          <text class="t t-ink" x="86" y="56">Select your symptoms</text>
+          <rect class="f-signal" x="86" y="72" width="76" height="32" rx="16"/><text class="t t-in" x="102" y="93">Fever</text>
+          <rect class="f-signal" x="172" y="72" width="82" height="32" rx="16"/><text class="t t-in" x="190" y="93">Cough</text>
+          <rect class="s-ink" fill="none" x="86" y="114" width="88" height="32" rx="16" stroke-width="1.8"/><text class="t t-ink" x="102" y="135">Fatigue</text>
+          <rect class="s-ink" fill="none" x="184" y="114" width="100" height="32" rx="16" stroke-width="1.8"/><text class="t t-ink" x="200" y="135">Headache</text>
+          <line class="s-ink" x1="86" y1="168" x2="314" y2="168" stroke-width="1" opacity=".3"/>
+          <text class="t t-mut" x="86" y="194">Confidence</text>
+          <rect x="86" y="204" width="228" height="14" rx="7" fill="var(--line)"/>
+          <rect class="f-signal" x="86" y="204" width="170" height="14" rx="7"/>
+          <text class="t t-mut" x="86" y="244">Description and precautions</text>
+          <rect x="86" y="254" width="200" height="8" rx="4" fill="var(--line)"/>
+          <rect x="86" y="270" width="150" height="8" rx="4" fill="var(--line)"/>
+        </svg>
+        <figcaption>Illustrative sketch of the interface</figcaption>
+      </figure>
+    </article>
+
+    <article class="proj p3">
+      <div>
+        <span class="pill">Sep 2024 – Jan 2025</span>
+        <h3>Blood group detection from fingerprints</h3>
+        <p class="role dev">I developed the model and wrote the paper</p>
+        <p class="role pm">I led the project and wrote the paper</p>
+        <p class="what">A predictive tool that estimates blood group from fingerprint patterns. The research is published in IEEE Xplore.</p>
+        <ul class="pts dev">
+          <li>Trained an SVM classifier to predict blood group from fingerprint patterns.</li>
+          <li>Built a Streamlit interface for live prediction and demos.</li>
+        </ul>
+        <ul class="pts pm">
+          <li>Led the work from research to a working prototype and defined the requirements.</li>
+          <li>Balanced technical feasibility against usability, and delivered a demo for stakeholder review.</li>
+        </ul>
+        <ul class="stack" aria-label="Technologies"><li>Python</li><li>Machine Learning</li><li>SVM</li><li>Streamlit</li></ul>
+        <a class="repo" href="https://github.com/ayusiparida/Blood-group-detection-using-fingerprint-analysis-" target="_blank" rel="noopener">Project repository on GitHub</a>
+      </div>
+      <figure class="proj-art">
+        <svg viewBox="0 0 400 320" role="img" aria-label="A fingerprint scanned and mapped to a blood group">
+          <g fill="none" class="s-ink" stroke-width="3.5" stroke-linecap="round">
+            <ellipse cx="120" cy="160" rx="18" ry="24"/>
+            <ellipse cx="120" cy="160" rx="34" ry="46" stroke-dasharray="90 12"/>
+            <ellipse cx="120" cy="160" rx="50" ry="68"/>
+            <ellipse cx="120" cy="160" rx="66" ry="90" stroke-dasharray="130 14"/>
+            <ellipse cx="120" cy="160" rx="82" ry="112" stroke-dasharray="160 10"/>
+          </g>
+          <rect x="30" y="152" width="180" height="6" rx="3" fill="var(--signal)" opacity=".85"/>
+          <path d="M226 160 H262" class="s-ink" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M252 148 L266 160 L252 172" class="s-ink" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect class="s-ink" fill="none" x="282" y="84" width="82" height="52" rx="12" stroke-width="2"/><text class="t t-ink" x="316" y="117">A</text>
+          <rect class="f-signal" x="282" y="146" width="82" height="52" rx="12"/><text class="t t-in" x="316" y="179">B</text>
+          <rect class="s-ink" fill="none" x="282" y="208" width="82" height="52" rx="12" stroke-width="2"/><text class="t t-ink" x="310" y="241">AB</text>
+          <text class="t t-mut" x="300" y="72">Group</text>
+        </svg>
+        <figcaption>Illustrative sketch of the idea</figcaption>
+      </figure>
+    </article>
+  </div>
+</section>
+
+
+<section class="sec" id="cases">
+  <div class="wrap">
+    <h2>Case studies</h2>
+
+    <div class="case">
+      <div>
+        <span class="pill">Jun 2025 – Apr 2026</span>
+        <h3>Gesture recognition for emergencies</h3>
+      </div>
+      <dl class="kv">
+        <dt>The problem</dt>
+        <dd>In an emergency, people who are deaf or non-verbal cannot always call out for help. They need a way to communicate quickly without speaking.</dd>
+        <dt>My role</dt>
+        <dd class="dev">Developer of the detection models and the surrounding Python pipeline.</dd>
+        <dd class="pm">Product lead, owning the work from problem discovery through delivery.</dd>
+        <dt>How I approached it</dt>
+        <dd class="dev"><ul>
+          <li>Prepared and preprocessed the gesture data, then trained and evaluated the models.</li>
+          <li>Used CNN and YOLOv10 so the system could both classify and locate gestures.</li>
+          <li>Optimized for real-time inference, because a slow response defeats the purpose.</li>
+        </ul></dd>
+        <dd class="pm"><ul>
+          <li>Analyzed user needs and defined two personas: general users and specially-abled users.</li>
+          <li>Shaped a dual-mode experience so each group gets what it needs.</li>
+          <li>Worked with engineers to make performance and reliability the core success metrics.</li>
+        </ul></dd>
+        <dt>What shipped</dt>
+        <dd>A real-time gesture recognition system for emergency assistance, measured against detection accuracy and response speed benchmarks.</dd>
+      </dl>
+    </div>
+
+    <div class="case">
+      <div>
+        <span class="pill">Jan 2025 – May 2025</span>
+        <h3>Multi-Disease Prediction System</h3>
+      </div>
+      <dl class="kv">
+        <dt>The problem</dt>
+        <dd>People want a quick, understandable first read on their health from the symptoms they have, without having to decode medical jargon.</dd>
+        <dt>My role</dt>
+        <dd class="dev">Full-stack developer across the model service, API and interface.</dd>
+        <dd class="pm">Product manager, from requirements gathering to launch.</dd>
+        <dt>How I approached it</dt>
+        <dd class="dev"><ul>
+          <li>Wrapped the machine learning models in Flask REST APIs for real-time inference.</li>
+          <li>Built React components for symptom selection and prediction visualization.</li>
+          <li>Connected frontend and backend with Axios and deployed on a cloud platform.</li>
+        </ul></dd>
+        <dd class="pm"><ul>
+          <li>Defined user stories and feature scope across backend services and the frontend.</li>
+          <li>Coordinated the deployment to production so the public could use it.</li>
+          <li>Prioritized features after launch that make results easier to trust and understand.</li>
+        </ul></dd>
+        <dt>What shipped</dt>
+        <dd>A live web application with disease prediction, a confidence score, a description of each condition and recommended precautions.</dd>
+      </dl>
+    </div>
+
+    <div class="case">
+      <div>
+        <span class="pill">Sep 2024 – Jan 2025</span>
+        <h3>Blood group detection from fingerprints</h3>
+      </div>
+      <dl class="kv">
+        <dt>The problem</dt>
+        <dd>Can patterns in a fingerprint be used to predict a person's blood group? I wanted to test the idea as a healthcare AI application.</dd>
+        <dt>My role</dt>
+        <dd class="dev">Model developer and research author.</dd>
+        <dd class="pm">Project lead and research author, running a cross-functional effort from research to prototype.</dd>
+        <dt>How I approached it</dt>
+        <dd class="dev"><ul>
+          <li>Preprocessed the fingerprint data and trained an SVM model.</li>
+          <li>Evaluated the model and built a Streamlit interface for real-time predictions.</li>
+        </ul></dd>
+        <dd class="pm"><ul>
+          <li>Defined the requirements for a predictive tool and balanced technical feasibility with usability.</li>
+          <li>Validated the concept with a working demo interface for stakeholder review.</li>
+        </ul></dd>
+        <dt>What shipped</dt>
+        <dd>A working prediction demo and a research paper published in IEEE Xplore.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="spot" aria-label="Research">
+  <div class="wrap">
+    <h2>Published in IEEE Xplore.</h2>
+    <p class="big">My research on predicting blood groups from fingerprint patterns is part of the IEEE Xplore library. It started as a university project and turned into a paper I authored and led.</p>
+    <dl class="facts">
+      <div><dt>Topic</dt><dd>Blood group detection using fingerprint analysis</dd></div>
+      <div><dt>Method</dt><dd>Support vector machine (SVM)</dd></div>
+      <div><dt>My role</dt><dd>Research author and project lead</dd></div>
+      <div><dt>Period</dt><dd>Sep 2024 – Jan 2025</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="sec" id="process">
+  <div class="wrap">
+    <h2>How I work</h2>
+    <ol class="steps dev">
+      <li><h3>Understand the problem</h3><p>Start with who needs it and what a good result looks like.</p></li>
+      <li><h3>Prepare the data</h3><p>Clean and preprocess before touching a model.</p></li>
+      <li><h3>Train and evaluate</h3><p>Build the model, then test it properly.</p></li>
+      <li><h3>Optimize for real use</h3><p>Tune for speed and reliability, not just accuracy.</p></li>
+      <li><h3>Ship it</h3><p>Wrap it in an API and interface, and deploy it.</p></li>
+    </ol>
+    <ol class="steps pm">
+      <li><h3>Discover</h3><p>Research the problem and the people who have it.</p></li>
+      <li><h3>Define</h3><p>Turn needs into personas, user stories and scope.</p></li>
+      <li><h3>Prioritize</h3><p>Decide with engineers what matters most first.</p></li>
+      <li><h3>Measure</h3><p>Set benchmarks that show when it is ready.</p></li>
+      <li><h3>Improve</h3><p>After launch, add what builds trust and clarity.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="stack" style="padding-top:0">
+  <div class="wrap">
+    <h2>Tools by project</h2>
+    <div class="mx-wrap">
+      <table class="mx">
+        <thead><tr><th scope="col">Technology</th><th scope="col">Gesture recognition</th><th scope="col">Disease prediction</th><th scope="col">Blood group detection</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Python</th><td class="y" aria-label="Used">&#10003;</td><td class="y" aria-label="Used">&#10003;</td><td class="y" aria-label="Used">&#10003;</td></tr>
+          <tr><th scope="row">Machine learning</th><td class="y" aria-label="Used">&#10003;</td><td class="y" aria-label="Used">&#10003;</td><td class="y" aria-label="Used">&#10003;</td></tr>
+          <tr><th scope="row">CNN and YOLOv10</th><td class="y" aria-label="Used">&#10003;</td><td class="n" aria-label="Not used">&ndash;</td><td class="n" aria-label="Not used">&ndash;</td></tr>
+          <tr><th scope="row">Computer vision</th><td class="y" aria-label="Used">&#10003;</td><td class="n" aria-label="Not used">&ndash;</td><td class="n" aria-label="Not used">&ndash;</td></tr>
+          <tr><th scope="row">Flask and REST API</th><td class="n" aria-label="Not used">&ndash;</td><td class="y" aria-label="Used">&#10003;</td><td class="n" aria-label="Not used">&ndash;</td></tr>
+          <tr><th scope="row">React.js and Axios</th><td class="n" aria-label="Not used">&ndash;</td><td class="y" aria-label="Used">&#10003;</td><td class="n" aria-label="Not used">&ndash;</td></tr>
+          <tr><th scope="row">SVM</th><td class="n" aria-label="Not used">&ndash;</td><td class="n" aria-label="Not used">&ndash;</td><td class="y" aria-label="Used">&#10003;</td></tr>
+          <tr><th scope="row">Streamlit</th><td class="n" aria-label="Not used">&ndash;</td><td class="n" aria-label="Not used">&ndash;</td><td class="y" aria-label="Used">&#10003;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="path" style="background:var(--panel)">
+  <div class="wrap">
+    <h2>My path so far</h2>
+    <ol class="tl">
+      <li>
+        <div class="d">Sep 2023</div>
+        <h3>Started B.Tech in Computer Science and Engineering</h3>
+        <p class="org">Vellore Institute of Technology, Bhopal</p>
+      </li>
+      <li>
+        <div class="d">Sep 2024 – Jan 2025</div>
+        <h3>Research author and project lead</h3>
+        <p class="org">Blood group detection using fingerprint analysis, VIT Bhopal</p>
+        <ul>
+          <li>Published the research in IEEE Xplore.</li>
+          <li>Led development end to end, from data preprocessing to implementation.</li>
+        </ul>
+      </li>
+      <li>
+        <div class="d">Jan 2025 – May 2025</div>
+        <h3>Multi-Disease Prediction System</h3>
+        <p class="org dev">Built and deployed a full-stack health app</p>
+        <p class="org pm">Led a full-stack health app from requirements to launch</p>
+      </li>
+      <li>
+        <div class="d">Jun 2025 – Apr 2026</div>
+        <h3>Gesture recognition for emergencies</h3>
+        <p class="org dev">Built a real-time gesture recognition system with CNN and YOLOv10</p>
+        <p class="org pm">Led a real-time accessibility product for deaf and non-verbal users</p>
+      </li>
+      <li>
+        <div class="d">May 2026 – Jul 2026</div>
+        <h3>AI/ML Intern</h3>
+        <p class="org">MPOnline Limited, Bhopal</p>
+        <ul>
+          <li>Worked through the machine learning workflow: data preprocessing, model development, training and evaluation.</li>
+          <li>Used Python to analyze datasets and build predictive solutions for practical problems.</li>
+        </ul>
+      </li>
+      <li>
+        <div class="d">May 2027</div>
+        <h3>Graduating</h3>
+        <p class="org">B.Tech in Computer Science and Engineering, CGPA 8.59 so far</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="skills">
+  <div class="wrap">
+    <h2>Skills</h2>
+    <div class="skillgrid dev">
+      <div class="sk"><h3>Languages</h3><ul class="chips"><li>Python</li><li>Java</li></ul></div>
+      <div class="sk"><h3>Machine learning</h3><ul class="chips"><li>Scikit-learn</li><li>TensorFlow</li><li>Keras</li><li>NumPy</li><li>Pandas</li><li>OpenCV</li><li>CNN</li><li>YOLOv10</li><li>SVM</li></ul></div>
+      <div class="sk"><h3>Web</h3><ul class="chips"><li>HTML</li><li>CSS</li><li>React.js</li><li>Flask</li><li>REST APIs</li><li>Axios</li><li>Streamlit</li></ul></div>
+      <div class="sk"><h3>Databases</h3><ul class="chips"><li>SQL</li><li>MySQL</li></ul></div>
+    </div>
+    <div class="skillgrid pm">
+      <div class="sk"><h3>Strategy</h3><ul class="chips"><li>Product strategy</li><li>Roadmapping</li><li>Feature prioritization</li></ul></div>
+      <div class="sk"><h3>Requirements</h3><ul class="chips"><li>Product requirements</li><li>User stories</li><li>User research</li><li>Needs analysis</li></ul></div>
+      <div class="sk"><h3>Ways of working</h3><ul class="chips"><li>Cross-functional collaboration</li><li>Agile</li><li>Scrum</li></ul></div>
+      <div class="sk"><h3>Data and tech</h3><ul class="chips"><li>SQL and data analysis</li><li>Technical product understanding</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="bring" style="padding-top:0">
+  <div class="wrap">
+    <h2>What I bring to a team</h2>
+    <div class="bring dev">
+      <div class="br"><h3>Models built for real time</h3><p>I have trained and tuned CNN and YOLOv10 models for fast inference, where a late answer is a wrong answer.</p></div>
+      <div class="br"><h3>End-to-end delivery</h3><p>I can take a model into a Flask API and a React interface, then deploy it so people can use it.</p></div>
+      <div class="br"><h3>Research discipline</h3><p>I have taken a project from data preprocessing and evaluation all the way to a published IEEE Xplore paper.</p></div>
+      <div class="br"><h3>Cloud foundations</h3><p>Completed the Microsoft Elevate internship covering Azure Fundamentals and cloud technologies.</p></div>
+    </div>
+    <div class="bring pm">
+      <div class="br"><h3>Users first</h3><p>I start from user needs and personas, and I design for people with very different abilities and situations.</p></div>
+      <div class="br"><h3>Clear scope</h3><p>I turn requirements into user stories and a focused feature set that engineers can build.</p></div>
+      <div class="br"><h3>Measurable launches</h3><p>I define benchmarks such as detection accuracy and response speed so readiness is not a guess.</p></div>
+      <div class="br"><h3>Trust by design</h3><p>I prioritize confidence scores and plain explanations so people understand what a result means.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="education" style="padding-top:0">
+  <div class="wrap">
+    <h2>Education and certifications</h2>
+    <div class="edu">
+      <div class="card">
+        <h3>Vellore Institute of Technology, Bhopal</h3>
+        <p>B.Tech in Computer Science and Engineering</p>
+        <p>Sep 2023 – May 2027</p>
+        <p><strong>CGPA 8.59</strong></p>
+      </div>
+      <div class="card">
+        <h3>Certifications</h3>
+        <ul>
+          <li>Microsoft Elevate Internship (AICTE): Microsoft Azure Fundamentals and Cloud Technologies</li>
+          <li>Applied Machine Learning in Python, Coursera</li>
+          <li class="dev">Computer Vision, Vityarthi</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="contact" id="contact">
+  <div class="wrap">
+    <h2>Let's build something useful.</h2>
+    <a class="email" href="mailto:ayushiparida2004@gmail.com">ayushiparida2004@gmail.com</a>
+    <div class="links">
+      <a class="btn amber" href="https://www.linkedin.com/in/ayusi-parida-b65126214/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn white" href="https://github.com/ayusiparida" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var bd=document.getElementById('b-dev'), bp=document.getElementById('b-pm');
+  function setLens(l){
+    document.body.setAttribute('data-lens',l);
+    bd.setAttribute('aria-pressed',String(l==='dev'));
+    bp.setAttribute('aria-pressed',String(l==='pm'));
+    try{localStorage.setItem('lens',l);}catch(e){}
+  }
+  bd.addEventListener('click',function(){setLens('dev');});
+  bp.addEventListener('click',function(){setLens('pm');});
+  try{var s=localStorage.getItem('lens'); if(s==='pm'||s==='dev'){setLens(s);}}catch(e){}
+})();
+</script>
+</body>
+</html>
